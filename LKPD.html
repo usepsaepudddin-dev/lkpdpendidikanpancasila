@@ -11,25 +11,27 @@
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* Mengembalikan body ke ukuran asli agar Sidebar tetap pas di layar HP */
+
+/* Mengizinkan seluruh halaman utama untuk digeser ke kanan-kiri */
 html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* Mengunci layar utama agar sidebar tidak melar */
+  overflow-x: auto !important; /* MENGUBAH HIDDEN MENJADI AUTO agar bisa digeser penuh */
+  -webkit-overflow-scrolling: touch; /* Membuat geseran di iPhone/Safari jadi mulus */
 }
 
-/* KODE BARU: Membuat hanya area soal saja yang bisa digeser kanan-kiri */
+/* Memastikan area konten utama mengambil ruang yang cukup untuk digeser */
 .area-konten-lks {
   width: 100%;
-  overflow-x: auto !important; 
-  -webkit-overflow-scrolling: touch; 
-  box-sizing: border-box;
+  display: block;
+  clear: both;
 }
 
-/* Mengunci lebar konten tempat soal LKS agar tidak menciut saat digeser */
+/* Mengunci lebar minimal konten soal agar layout-nya utuh (tidak menciut) saat digeser */
 .area-konten-lks > * {
   min-width: 850px; 
+  display: inline-block; /* Membantu elemen horizontal tetap sejajar ke kanan */
 }
 </style>
 <style>
