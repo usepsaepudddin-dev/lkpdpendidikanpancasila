@@ -11,45 +11,15 @@
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 1. MENGIZINKAN SCROLL HORIZONTAL DI BODY SECARA WAJAR */
 html, body {
   width: 100%;
-  margin: 0;
-  padding: 0;
-  overflow-x: auto !important; 
-  -webkit-overflow-scrolling: touch;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch; /* Membuat geseran mulus di HP Android/iPhone */
 }
 
-/* 2. PERBAIKAN: JANGAN GUNAKAN FLEX PADA BODY */
-/* Berikan aturan flex HANYA pada pembungkus luar jika ada, atau biarkan mengalir normal */
 body {
-  display: block !important; /* Mengembalikan body ke setelan dasar */
-  min-width: 100%;
-}
-
-/* 3. MEMBUNGKUS AREA SOAL AGAR UTUH SEBAGAI SATU LEMBAR KERJA */
-/* Gabungan kotak pilihan tugas dan konten LKPD diatur di sini */
-.area-konten-lks {
-  display: block;
-  min-width: 850px !important; /* Memaksa lembar kerja berukuran 850px agar bisa di-scroll mentok */
-  float: left; /* Membuatnya berjejer di sebelah sidebar */
+  min-width: 950px; /* Memaksa lebar halaman minimal 950px agar seluruh tabel admin muat dan bisa digeser */
   box-sizing: border-box;
-  padding: 15px;
-}
-
-/* 4. MENGATUR SIDEBAR AGAR PROPORSIOAL DI HP */
-.sidebar-anda {
-  width: 250px; 
-  max-width: 40vw; /* Membatasi agar lebar sidebar di HP maksimal hanya 40% dari lebar layar */
-  float: left;
-  box-sizing: border-box;
-}
-
-/* 5. MEMBERSIHKAN ELEMEN FLOAT */
-body::after {
-  content: "";
-  display: table;
-  clear: both;
 }
 </style>
 
