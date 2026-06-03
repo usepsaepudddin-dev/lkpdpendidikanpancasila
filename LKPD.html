@@ -11,15 +11,25 @@
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* Mengembalikan body ke ukuran asli agar Sidebar tetap pas di layar HP */
 html, body {
   width: 100%;
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch; /* Membuat geseran mulus di HP Android/iPhone */
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Mengunci layar utama agar sidebar tidak melar */
 }
 
-body {
-  min-width: 950px; /* Memaksa lebar halaman minimal 950px agar seluruh tabel admin muat dan bisa digeser */
+/* KODE BARU: Membuat hanya area soal saja yang bisa digeser kanan-kiri */
+.area-konten-lks {
+  width: 100%;
+  overflow-x: auto !important; 
+  -webkit-overflow-scrolling: touch; 
   box-sizing: border-box;
+}
+
+/* Mengunci lebar konten tempat soal LKS agar tidak menciut saat digeser */
+.area-konten-lks > * {
+  min-width: 850px; 
 }
 </style>
 <style>
