@@ -11,42 +11,45 @@
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* 1. MEMBUKA AKSES GESER HORIZONTAL PENUH PADA LAYAR */
+/* 1. MENGIZINKAN SCROLL HORIZONTAL DI BODY SECARA WAJAR */
 html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: auto !important; /* Wajib auto/scroll agar bisa digeser */
-  -webkit-overflow-scrolling: touch; 
+  overflow-x: auto !important; 
+  -webkit-overflow-scrolling: touch;
 }
 
-/* 2. MEMBUAT CONTAINER UTAMA MENGIKUTI LEBAR TOTAL KONTEN */
-/* Ganti .wrapper-utama dengan class pembungkus sidebar + area kerja Anda jika ada */
-.wrapper-utama, body {
-  display: flex !important;
-  flex-direction: row;
-  min-width: max-content; /* Memaksa halaman melebar ke kanan mengikuti isi soal */
+/* 2. PERBAIKAN: JANGAN GUNAKAN FLEX PADA BODY */
+/* Berikan aturan flex HANYA pada pembungkus luar jika ada, atau biarkan mengalir normal */
+body {
+  display: block !important; /* Mengembalikan body ke setelan dasar */
+  min-width: 100%;
 }
 
-/* 3. MENGATUR SIDEBAR AGAR TIDAK LEBIH LEBAR DARI LEMBAR KERJA */
-/* Ganti .sidebar-anda sesuai dengan class/id sidebar yang Anda gunakan */
-.sidebar-anda {
-  width: 250px; /* Atur lebar tetap sidebar (misal: 250px atau 20vw) */
-  max-width: 60vw; /* Mengunci agar tidak akan pernah melebihi lebar layar HP */
-  flex-shrink: 0; /* Mencegah sidebar menciut atau gepeng */
-}
-
-/* 4. MENGATUR AREA KERJA SISWA AGAR UTUH DAN BISA DIGESER MENTOK */
+/* 3. MEMBUNGKUS AREA SOAL AGAR UTUH SEBAGAI SATU LEMBAR KERJA */
+/* Gabungan kotak pilihan tugas dan konten LKPD diatur di sini */
 .area-konten-lks {
-  flex-grow: 1;
-  flex-shrink: 0;
-  overflow-x: visible !important; /* Biarkan konten meluap ke kanan agar bisa digeser di body */
+  display: block;
+  min-width: 850px !important; /* Memaksa lembar kerja berukuran 850px agar bisa di-scroll mentok */
+  float: left; /* Membuatnya berjejer di sebelah sidebar */
+  box-sizing: border-box;
+  padding: 15px;
 }
 
-/* Mengunci lebar lembar kerja siswa agar layout tidak hancur */
-.area-konten-lks > * {
-  min-width: 850px !important; 
-  display: block;
+/* 4. MENGATUR SIDEBAR AGAR PROPORSIOAL DI HP */
+.sidebar-anda {
+  width: 250px; 
+  max-width: 40vw; /* Membatasi agar lebar sidebar di HP maksimal hanya 40% dari lebar layar */
+  float: left;
+  box-sizing: border-box;
+}
+
+/* 5. MEMBERSIHKAN ELEMEN FLOAT */
+body::after {
+  content: "";
+  display: table;
+  clear: both;
 }
 </style>
 
