@@ -11,29 +11,45 @@
 <link rel="preconnect" href="https://gstatic.com" crossorigin>
 <link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-
-/* Mengizinkan seluruh halaman utama untuk digeser ke kanan-kiri */
+/* 1. MEMBUKA AKSES GESER HORIZONTAL PENUH PADA LAYAR */
 html, body {
   width: 100%;
   margin: 0;
   padding: 0;
-  overflow-x: auto !important; /* MENGUBAH HIDDEN MENJADI AUTO agar bisa digeser penuh */
-  -webkit-overflow-scrolling: touch; /* Membuat geseran di iPhone/Safari jadi mulus */
+  overflow-x: auto !important; /* Wajib auto/scroll agar bisa digeser */
+  -webkit-overflow-scrolling: touch; 
 }
 
-/* Memastikan area konten utama mengambil ruang yang cukup untuk digeser */
+/* 2. MEMBUAT CONTAINER UTAMA MENGIKUTI LEBAR TOTAL KONTEN */
+/* Ganti .wrapper-utama dengan class pembungkus sidebar + area kerja Anda jika ada */
+.wrapper-utama, body {
+  display: flex !important;
+  flex-direction: row;
+  min-width: max-content; /* Memaksa halaman melebar ke kanan mengikuti isi soal */
+}
+
+/* 3. MENGATUR SIDEBAR AGAR TIDAK LEBIH LEBAR DARI LEMBAR KERJA */
+/* Ganti .sidebar-anda sesuai dengan class/id sidebar yang Anda gunakan */
+.sidebar-anda {
+  width: 250px; /* Atur lebar tetap sidebar (misal: 250px atau 20vw) */
+  max-width: 100vw; /* Mengunci agar tidak akan pernah melebihi lebar layar HP */
+  flex-shrink: 0; /* Mencegah sidebar menciut atau gepeng */
+}
+
+/* 4. MENGATUR AREA KERJA SISWA AGAR UTUH DAN BISA DIGESER MENTOK */
 .area-konten-lks {
-  width: 100%;
-  display: block;
-  clear: both;
+  flex-grow: 1;
+  flex-shrink: 0;
+  overflow-x: visible !important; /* Biarkan konten meluap ke kanan agar bisa digeser di body */
 }
 
-/* Mengunci lebar minimal konten soal agar layout-nya utuh (tidak menciut) saat digeser */
+/* Mengunci lebar lembar kerja siswa agar layout tidak hancur */
 .area-konten-lks > * {
-  min-width: 850px; 
-  display: inline-block; /* Membantu elemen horizontal tetap sejajar ke kanan */
+  min-width: 850px !important; 
+  display: block;
 }
 </style>
+
 <style>
 /* --- GOOGLE FONTS CORE --- */
 @import url('https://googleapis.com');
