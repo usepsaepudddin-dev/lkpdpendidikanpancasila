@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Validasi Area Ujian - SMAN 15 Maluku Tengah</title>
+<!-- Font Awesome untuk Icon Radar -->
+<link rel="stylesheet" href="https://cloudflare.com">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+  body { background: #f0f4f8; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+  .radar-card { background: white; padding: 40px 30px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); text-align: center; max-width: 400px; width: 100%; border: 1px solid #e2e8f0; }
+  .radar-icon { font-size: 60px; color: #2a5298; margin-bottom: 20px; animation: pulse 1.5s infinite ease-in-out; }
+  h2 { font-size: 20px; color: #1e3c72; margin-bottom: 10px; font-weight: 700; }
+  p { font-size: 14px; color: #64748b; line-height: 1.6; margin-bottom: 25px; }
+  .status-box { padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 600; display: none; margin-bottom: 15px; }
+  .status-loading { background-color: #eff6ff; color: #2563eb; }
+  .status-error { background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+  .btn-retry { display: none; background: #ff7f50; color: white; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; border: none; cursor: pointer; width: 100%; transition: 0.2s; }
+  .btn-retry:hover { background: #e06336; }
+  @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.1); opacity: 0.7; } }
+</style>
+</head>
+<body>
+
+<div class="radar-card">
+  <div class="radar-icon" id="iconRadar"><i class="fa-solid fa-satellite-dish"></i></div>
+  <h2 id="titleStatus">Memeriksa Kehadiran</h2>
+  <p id="descStatus">Sistem sedang memverifikasi koordinat GPS perangkat Anda untuk memastikan Anda berada di dalam lingkungan area ujian resmi.</p>
+  
+  <!-- Kotak Indikator Proses -->
+  <div id="statusIndicator" class="status-box status-loading">
+    <i class="fa-solid fa-spinner fa-spin"></i> Menghubungkan ke Satelit GPS...
+  </div>
+  
+  <button id="btnRetry" class="btn-retry" onclick="mulaiValidasiLokasi()"><i class="fa-solid fa-arrow-rotate-right"></i> Coba Validasi Ulang</button>
+</div>
+
+<script>
+  // SILAKAN PASTIKAN DIISI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG ASLI
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3Wz-KzLUmWQgnuPHp0k1iDbTsY6Icw-Gwp-YVC3Zv_MoXVC6HJb0imNFmgmY2VKnX/exec";
+  
+  // 🔥 SEKARANG DINAMIS: Angka koordinat awal di-set 0 karena akan di-download langsung dari Google Sheet!
+  let LAT_SEKOLAH = 0; 
+  let LON_SEKOLAH = 0; 
+  let RADIUS_MAKSIMAL_METER = 70; 
+
+  window.onload = function() {
+    ambilParameterLokasiServer();
+  };
+
+  function ambilParameterLokasiServer() {
+    const indicator = document.getElementById("statusIndicator");
+    indicator.className = "status-box status-loading";
+    indicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sinkronisasi Koordinat Admin...';
+    indicator.style.display = "block";
+
+    // 1. Download koordinat mutakhir pusat Admin dari Google Sheet (Sel K3, K4, K5)
+    fetch(WEB_APP_URL + "?get=status_lokasi")
+    .then(response => response.json())
+    .then(data => {
+      if (data.kunci_lokasi_aktif === false) {
+        // Jika Admin menyetel K2 = FALSE di spreadsheet, bypass otomatis tanpa cek GPS!
+        bypassMasukKuis();
+      } else {
+        // 🔥 MASUKKAN DATA KOORDINAT HASIL DOWNLOAD DARI SPREADSHEET SECARA DINAMIS
+        LAT_SEKOLAH = data.lat_target;
+        LON_SEKOLAH = data.lon_target;
+        RADIUS_MAKSIMAL_METER = data.radius_target;
+        
+        // Lanjutkan ke pemindaian GPS perangkat siswa
+        mulaiValidasiLokasi();
+      }
+    })
+    .catch(err => {
+      tampilkanError("🚨 KONEKSI GAGAL", "Gagal mengunduh parameter koordinat dinamis dari server Google Sheet.");
+    });
+  }
+
+  function bypassMasukKuis() {
+    const indicator = document.getElementById("statusIndicator");
+    document.getElementById("titleStatus").innerText = "Akses Diizinkan";
+    document.getElementById("descStatus").innerText = "Pengaman lokasi dinonaktifkan oleh Admin. Mengalihkan Anda ke ruang ujian...";
+    indicator.className = "status-box";
+    indicator.style.backgroundColor = "#d1fae5";
+    indicator.style.color = "#065f46";
+    indicator.innerHTML = '<i class="fa-solid fa-circle-check"></i> Lolos Validasi!';
+    indicator.style.display = "block";
+    
+    setTimeout(() => {
+      window.location.href = "Latihan_Soal.html"; 
+    }, 1500);
+  }
+
+  function mulaiValidasiLokasi() {
+    const indicator = document.getElementById("statusIndicator");
+    const btn = document.getElementById("btnRetry");
+    const icon = document.getElementById("iconRadar");
+    
+    indicator.className = "status-box status-loading";
+    indicator.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memindai Radius Jarak Geofence Anda...';
+    indicator.style.display = "block";
+    btn.style.display = "none";
+    icon.style.color = "#2a5298";
+
+    if (!navigator.geolocation) {
+      tampilkanError("🚨 PERANGKAT TIDAK MENDUKUNG", "HP Anda tidak memiliki sensor lokasi.");
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      function(position) {
+        let latSiswa = position.coords.latitude;
+        let lonSiswa = position.coords.longitude;
+        
+        // Hitung jarak berdasarkan koordinat dinamis yang baru saja di-download dari server
+        let jarakMeter = hitungJarakHaversine(latSiswa, lonSiswa, LAT_SEKOLAH, LON_SEKOLAH);
+
+        if (jarakMeter > RADIUS_MAKSIMAL_METER) {
+          tampilkanError(
+            "🚨 AKSES DILUAR AREA", 
+            "Anda berada di luar area lokasi ujian resmi (Jarak Anda: " + Math.round(jarakMeter) + " meter dari pusat pengawas). Ujian wajib dilakukan di lokasi!"
+          );
+        } else {
+          indicator.className = "status-box";
+          indicator.style.backgroundColor = "#d1fae5";
+          indicator.style.color = "#065f46";
+          indicator.innerHTML = '<i class="fa-solid fa-circle-check"></i> Lokasi Cocok! Membuka Kuis...';
+          
+          setTimeout(() => {
+            window.location.href = "Latihan_Soal.html";
+          }, 1500);
+        }
+      },
+      function(error) {
+        tampilkanError(
+          "🔒 IZIN GPS DITOLAK", 
+          "Akses ditolak. Anda wajib mengizinkan lokasi browser perangkat Anda untuk mengikuti ujian."
+        );
+      },
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  }
+
+  function tampilkanError(judul, pesan) {
+    document.getElementById("titleStatus").innerText = judul;
+    document.getElementById("descStatus").innerText = pesan;
+    document.getElementById("statusIndicator").style.display = "none";
+    document.getElementById("btnRetry").style.display = "block";
+    document.getElementById("iconRadar").style.color = "#dc2626";
+  }
+
+  function hitungJarakHaversine(lat1, lon1, lat2, lon2) {
+    const R = 6371000; 
+    let dLat = (lat2 - lat1) * Math.PI / 180;
+    let dLon = (lon2 - lon1) * Math.PI / 180;
+    let a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2);
+    let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CBT Latihan Soal - SMAN 15 Maluku Tengah</title>
+<!-- Google Fonts & Font Awesome Icons -->
+<link href="https://googleapis.com" rel="stylesheet">
+<link rel="stylesheet" href="https://cloudflare.com">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+body { background: #f0f4f8; display: flex; min-height: 100vh; color: #333; overflow-x: hidden; }
+/* --- LAYOUT UTAMA --- */
+.app-container { display: flex; width: 100%; min-height: 100vh; }
+/* --- SIDEBAR (IDENTITAS SISWA) --- */
+.sidebar { width: 320px; background: linear-gradient(180deg, #1e3c72 0%, #2a5298 100%); padding: 30px 20px; color: white; display: flex; flex-direction: column; gap: 25px; box-shadow: 4px 0 15px rgba(0,0,0,0.1); position: fixed; height: 100vh; z-index: 10; transition: all 0.3s; }
+.sidebar-header h2 { font-size: 20px; font-weight: 600; text-align: center; margin-bottom: 5px; text-transform: uppercase; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label { font-size: 13px; font-weight: 500; color: #cbd5e1; }
+.form-select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); color: white; font-size: 14px; outline: none; cursor: pointer; transition: 0.3s; }
+.form-select option { background: #1e3c72; color: white; }
+.form-select:focus { background: rgba(255,255,255,0.2); border-color: #ff7f50; }
+.student-info-box { background: rgba(255,255,255,0.08); padding: 15px; border-radius: 12px; font-size: 13px; line-height: 1.6; border-left: 4px solid #ff7f50; display: none; }
+/* --- AREA UTAMA CBT --- */
+.main-content { flex: 1; margin-left: 320px; padding: 40px; display: flex; flex-direction: column; min-height: 100vh; background: #f8fafc; }
+.cbt-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 30px; }
+.cbt-title h1 { font-size: 18px; color: #1e3c72; font-weight: 600; }
+.timer-badge { background: #fee2e2; color: #ef4444; padding: 8px 16px; border-radius: 50px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+/* --- KARTU SOAL --- */
+.cbt-body { display: grid; grid-template-columns: 1fr 280px; gap: 30px; flex: 1; }
+.question-card { background: white; border-radius: 15px; padding: 35px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 20px; position: relative; min-height: 400px; }
+.question-number { font-size: 16px; font-weight: 600; color: #2a5298; background: #e0e7ff; padding: 6px 16px; border-radius: 8px; align-self: flex-start; }
+.question-text { font-size: 16px; font-weight: 500; color: #1e293b; line-height: 1.7; margin-bottom: 10px; }
+/* --- PILIHAN JAWABAN (ABCDE) --- */
+.options-container { display: flex; flex-direction: column; gap: 12px; }
+.option-item { display: flex; align-items: center; padding: 15px 20px; border: 2px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; position: relative; }
+.option-item:hover { border-color: #cbd5e1; background: #f8fafc; }
+.option-item.selected { border-color: #2a5298; background: #eff6ff; font-weight: 500; }
+.option-radio { display: none; }
+.option-label { display: flex; align-items: center; gap: 15px; width: 100%; font-size: 15px; color: #334155; }
+.option-badge { display: flex; justify-content: center; align-items: center; width: 32px; height: 32px; border-radius: 50%; background: #f1f5f9; border: 1px solid #cbd5e1; font-weight: 600; font-size: 14px; color: #475569; transition: 0.2s; }
+.option-item.selected .option-badge { background: #2a5298; color: white; border-color: #2a5298; }
+/* --- NAVIGASI TOMBOL BAWAH --- */
+.navigation-buttons { display: flex; justify-content: space-between; margin-top: auto; padding-top: 30px; border-top: 1px solid #f1f5f9; }
+.btn { padding: 12px 24px; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; display: flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none; }
+.btn-prev { background: #e2e8f0; color: #475569; }
+.btn-prev:hover { background: #cbd5e1; }
+.btn-next { background: #2a5298; color: white; margin-left: auto; }
+.btn-next:hover { background: #1e3c72; }
+.btn-submit { background: #10b981; color: white; display: none; }
+.btn-submit:hover { background: #059669; }
+.btn-home { background: #ff7f50; color: white; justify-content: center; width: 100%; margin-top: auto; }
+.btn-home:hover { background: #e06336; }
+/* --- PANEL NOMOR SOAL (RIGHT BAR) --- */
+.number-panel { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; height: fit-content; }
+.panel-title { font-size: 14px; font-weight: 600; color: #475569; margin-bottom: 15px; text-transform: uppercase; text-align: center; }
+.grid-numbers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.num-box { aspect-ratio: 1; border-radius: 8px; border: 2px solid #e2e8f0; display: flex; justify-content: center; align-items: center; font-size: 14px; font-weight: 600; color: #64748b; cursor: pointer; transition: 0.2s; }
+.num-box:hover { border-color: #94a3b8; }
+.num-box.answered { background: #2a5298; color: white; border-color: #2a5298; }
+.num-box.active { border-color: #ff7f50; color: #ff7f50; }
+.num-box.answered.active { border-color: #ff7f50; background: #2a5298; color: white; }
+/* --- MODAL DIALOG (POPUP NILAI) --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 100; opacity: 0; pointer-events: none; transition: 0.3s ease; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.result-modal { background: white; border-radius: 20px; padding: 40px; width: 90%; max-width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); transform: scale(0.9); transition: 0.3s ease; }
+.modal-overlay.active .result-modal { transform: scale(1); }
+.result-score { font-size: 64px; font-weight: 700; color: #10b981; margin: 20px 0; }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; margin-top: 25px; }
+/* --- LOADING OVERLAY --- */
+.loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(255,255,255,0.8); z-index:999; display:flex; justify-content:center; align-items:center; flex-direction:column; gap:15px; font-weight:500; color:#1e3c72; }
+.spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid #2a5298; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+@media print {  body {    display: none !important;  }}
+
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+<div class="spinner"></div>
+<div id="loadingText">Menghubungkan ke server database Google Sheet...</div>
+</div>
+<div class="app-container">
+<!-- SIDEBAR PANE -->
+<div class="sidebar">
+<div class="sidebar-header">
+<h2>Identitas Peserta</h2>
+</div>
+<div class="form-group">
+<label><i class="fa-solid fa-list-ol"></i> Pilih Latihan Ke-</label>
+<select class="form-select" id="selectLatihan" onchange="initKuis()">
+<option value="">-- Memuat paket... --</option>
+</select>
+</div>
+<div class="form-group">
+<label><i class="fa-solid fa-user-graduate"></i> Pilih Nama Anda</label>
+<select class="form-select" id="selectSiswa" onchange="updateIdentitas()">
+<option value="">-- Memuat nama... --</option>
+</select>
+</div>
+<div class="student-info-box" id="infoBox">
+<strong>ID:</strong> <span id="lblID">-</span><br>
+<strong>Nama:</strong> <span id="lblNama">-</span><br>
+<strong>Kelas:</strong> <span id="lblKelas">-</span>
+</div>
+<button class="btn btn-home" onclick="kembaliKeAwal()"><i class="fa-solid fa-house"></i> Kembali ke Awal</button>
+</div>
+<!-- MAIN AREA -->
+<div class="main-content">
+<div class="cbt-header">
+<div class="cbt-title">
+<h1 id="kuisTitle">Mata Pelajaran: Pendidikan Pancasila</h1>
+</div>
+<div class="timer-badge">
+<i class="fa-solid fa-clock"></i> <span id="timer">30:00</span>
+</div>
+</div>
+<div class="cbt-body">
+<!-- Box Konten Soal -->
+<div class="question-card">
+<div class="question-number" id="currentNumLabel">Soal 1</div>
+<div class="question-text" id="questionText">Memuat soal...</div>
+<div class="options-container" id="optionsContainer">
+<!-- Pilihan bergaya ABCDE di-load dinamis -->
+</div>
+<div class="navigation-buttons">
+<button class="btn btn-prev" id="btnPrev" onclick="changeQuestion(-1)"><i class="fa-solid fa-arrow-left"></i> Kembali</button>
+<button class="btn btn-next" id="btnNext" onclick="changeQuestion(1)">Lanjut <i class="fa-solid fa-arrow-right"></i></button>
+<button class="btn btn-submit" id="btnSubmit" onclick="submitExam()"><i class="fa-solid fa-paper-plane"></i> Kirim Jawaban</button>
+</div>
+</div>
+<!-- Panel Kanan Nomor Navigasi -->
+<div class="number-panel">
+<div class="panel-title">Navigasi Soal</div>
+<div class="grid-numbers" id="gridNumbers">
+<!-- Box nomor di-generate via JS -->
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- POPUP HASIL AKHIR -->
+<div class="modal-overlay" id="resultModal">
+<div class="result-modal">
+<h2 style="color:#1e3c72;">Latihan Selesai!</h2>
+<p style="margin-top: 10px; color:#64748b;">Nilai ujian kamu adalah:</p>
+<div class="result-score" id="scoreDisplay">0</div>
+<p id="resultStatus" style="font-weight:500; color:#475569;"></p>
+<div class="modal-buttons">
+<button class="btn btn-next" style="margin:0; justify-content:center;" onclick="closeModal()"><i class="fa-solid fa-magnifying-glass"></i> Lihat Review Jawaban</button>
+<button class="btn btn-home" onclick="kembaliKeAwal()"><i class="fa-solid fa-rotate-left"></i> Keluar Ke Halaman Utama</button>
+</div>
+</div>
+</div>
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3Wz-KzLUmWQgnuPHp0k1iDbTsY6Icw-Gwp-YVC3Zv_MoXVC6HJb0imNFmgmY2VKnX/exec";
+let bankSoalGlobal = {};
+let listSoalAktif = [];
+let indexSoalSekarang = 0;
+let jawabanSiswa = {};
+let idSiswaTerpilih = "";
+let totalWaktuDetik = 1800; 
+let intervalTimer = null;
+let databaseSiswaGlobal = [];
+
+// SINKRONISASI TOTAL: Mengambil data paket latihan dan nama siswa murni dari Google Sheets
+window.onload = function() {
+fetch(WEB_APP_URL)
+.then(response => response.json())
+.then(dataSoal => {
+bankSoalGlobal = dataSoal;
+let selectLatihan = document.getElementById("selectLatihan");
+selectLatihan.innerHTML = "";
+Object.keys(bankSoalGlobal).forEach(key => {
+let opt = document.createElement("option");
+opt.value = key;
+opt.textContent = "Latihan Soal " + key;
+selectLatihan.appendChild(opt);
+});
+return fetch(WEB_APP_URL + "?role=admin");
+})
+.then(response => response.json())
+.then(dataSiswa => {
+document.getElementById("loadingOverlay").style.display = "none";
+if (dataSiswa.error) { return alert("Gagal memuat database siswa: " + dataSiswa.error); }
+
+// PERBAIKAN UTAMA: Menyimpan data kiriman Google Sheet ke variabel global agar bisa diperiksa nilainya
+databaseSiswaGlobal = dataSiswa.siswa; 
+
+let selectSiswa = document.getElementById("selectSiswa");
+selectSiswa.innerHTML = '<option value="">-- Pilih Nama --</option>';
+databaseSiswaGlobal.forEach(s => {
+let opt = document.createElement("option");
+opt.value = s.id;
+opt.setAttribute("data-nama", s.nama);
+opt.setAttribute("data-kelas", s.kelas);
+opt.textContent = s.nama;
+selectSiswa.appendChild(opt);
+});
+initKuis();
+})
+.catch(err => {
+document.getElementById("loadingOverlay").style.display = "none";
+alert("Koneksi gagal. Periksa kembali URL Google Apps Script Anda atau koneksi internet.");
+});
+};
+
+function initKuis() {
+let paketDipilih = document.getElementById("selectLatihan").value;
+if(!paketDipilih) return;
+listSoalAktif = bankSoalGlobal[paketDipilih] || [];
+if (listSoalAktif.length === 0) {
+document.getElementById("questionText").innerText = "Paket soal belum aktif atau tidak ditemukan.";
+document.getElementById("optionsContainer").innerHTML = "";
+return;
+}
+jawabanSiswa = {};
+generateNavigasi();
+bukaSoal(0);
+}
+
+function updateIdentitas() {
+  let select = document.getElementById("selectSiswa");
+  idSiswaTerpilih = select.value;
+  let opt = select.options[select.selectedIndex];
+  
+  if (idSiswaTerpilih !== "") {
+    let paketDipilih = document.getElementById("selectLatihan").value;
+    
+    // Membaca dari variabel global yang sudah fiks menyimpan database nilai
+    let dataSiswaMurni = databaseSiswaGlobal.find(s => s.id === idSiswaTerpilih);
+    let nilaiLatihanSekarang = dataSiswaMurni ? dataSiswaMurni["nilai_latihan_" + paketDipilih] : "-";
+
+    if (nilaiLatihanSekarang !== undefined && nilaiLatihanSekarang !== "" && nilaiLatihanSekarang !== "-") {
+      alert("Maaf, Anda sudah pernah mengerjakan Latihan Soal " + paketDipilih + " dengan nilai: " + nilaiLatihanSekarang + ".\nAnda tidak dapat mengerjakan ulang ujian ini!");
+      select.value = ""; 
+      document.getElementById("infoBox").style.display = "none";
+      return; 
+    }
+
+    document.getElementById("lblID").innerText = idSiswaTerpilih;
+    document.getElementById("lblNama").innerText = opt.getAttribute("data-nama");
+    document.getElementById("lblKelas").innerText = opt.getAttribute("data-kelas");
+    document.getElementById("infoBox").style.display = "block";
+    laporOnlineKeAdmin(idSiswaTerpilih);
+    if (!intervalTimer) mulaiTimer();
+  } else {
+    document.getElementById("infoBox").style.display = "none";
+  }
+}
+
+function laporOnlineKeAdmin(idSiswa) {
+if(!idSiswa) return;
+fetch(WEB_APP_URL, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify({ id_siswa: idSiswa, aksi: "MULAI_UJIAN" })
+}).catch(e => console.log("Gagal kirim log online."));
+}
+
+function generateNavigasi() {
+let grid = document.getElementById("gridNumbers");
+grid.innerHTML = "";
+listSoalAktif.forEach((s, idx) => {
+let box = document.createElement("div");
+box.className = "num-box";
+box.id = "numBox_" + idx;
+box.innerText = idx + 1;
+box.onclick = () => bukaSoal(idx);
+grid.appendChild(box);
+});
+}
+
+function bukaSoal(index) {
+if (index < 0 || index >= listSoalAktif.length) return;
+indexSoalSekarang = index;
+document.querySelectorAll(".num-box").forEach(el => el.classList.remove("active"));
+let boxAktif = document.getElementById("numBox_" + index);
+if (boxAktif) boxAktif.classList.add("active");
+let soal = listSoalAktif[index];
+document.getElementById("currentNumLabel").innerText = "Soal " + (index + 1);
+document.getElementById("questionText").innerText = soal.text;
+let container = document.getElementById("optionsContainer");
+container.innerHTML = "";
+let opsiAbjad = ['A', 'B', 'C', 'D', 'E'];
+opsiAbjad.forEach(huruf => {
+if(soal.options[huruf]) {
+let item = document.createElement("div");
+item.className = "option-item";
+if (jawabanSiswa[soal.id] === huruf) item.className += " selected";
+item.onclick = () => simpanJawaban(huruf);
+item.innerHTML = `
+<div class="option-label">
+<div class="option-badge">${huruf}</div>
+<span>${soal.options[huruf]}</span>
+</div>
+`;
+container.appendChild(item);
+}
+});
+document.getElementById("btnPrev").style.visibility = index === 0 ? "hidden" : "visible";
+if (index === listSoalAktif.length - 1) {
+document.getElementById("btnNext").style.display = "none";
+document.getElementById("btnSubmit").style.display = "flex";
+} else {
+document.getElementById("btnNext").style.display = "flex";
+document.getElementById("btnSubmit").style.display = "none";
+}
+}
+
+function simpanJawaban(huruf) {
+let soal = listSoalAktif[indexSoalSekarang];
+jawabanSiswa[soal.id] = huruf;
+let box = document.getElementById("numBox_" + indexSoalSekarang);
+if (box) box.classList.add("answered");
+bukaSoal(indexSoalSekarang);
+}
+
+function changeQuestion(arah) {
+bukaSoal(indexSoalSekarang + arah);
+}
+
+function mulaiTimer() {
+intervalTimer = setInterval(() => {
+if (totalWaktuDetik <= 0) {
+clearInterval(intervalTimer);
+alert("Waktu ujian telah habis!");
+submitExam();
+return;
+}
+totalWaktuDetik--;
+let m = Math.floor(totalWaktuDetik / 60).toString().padStart(2, '0');
+let s = (totalWaktuDetik % 60).toString().padStart(2, '0');
+document.getElementById("timer").innerText = m + ":" + s;
+}, 1000);
+}
+
+function submitExam() {
+if (!idSiswaTerpilih) { return alert("Identitas belum valid. Gagal mengirim!"); }
+if (!confirm("Apakah kamu yakin ingin mengirim semua jawaban sekarang?")) return;
+clearInterval(intervalTimer);
+let benar = 0;
+listSoalAktif.forEach(s => {
+if (jawabanSiswa[s.id] && jawabanSiswa[s.id].trim().toUpperCase() === s.key.trim().toUpperCase()) {
+benar++;
+}
+});
+let skor = Math.round((benar / listSoalAktif.length) * 100);
+let paket = document.getElementById("selectLatihan").value;
+document.getElementById("loadingOverlay").style.display = "flex";
+document.getElementById("loadingText").innerText = "Menyimpan nilai ke spreadsheet...";
+const payload = {
+id_siswa: idSiswaTerpilih,
+nilai: skor,
+kolom: "Nilai_Latihan_" + paket,
+aksi: "KIRIM_NILAI"
+};
+fetch(WEB_APP_URL, {
+method: "POST",
+headers: { "Content-Type": "text/plain;charset=utf-8" },
+body: JSON.stringify(payload)
+})
+.then(res => res.json())
+.then(res => {
+document.getElementById("loadingOverlay").style.display = "none";
+document.getElementById("scoreDisplay").innerText = skor;
+document.getElementById("resultStatus").innerText = skor >= 75 ? "Selamat, kamu lulus KKM!" : "Ayo belajar lagi dengan giat!";
+document.getElementById("resultModal").classList.add("active");
+})
+.catch(err => {
+document.getElementById("loadingOverlay").style.display = "none";
+alert("Gagal kirim nilai ke server. Hubungi Pak Usep dan JANGAN TUTUP TAB INI!");
+});
+}
+
+function closeModal() { 
+document.getElementById("resultModal").classList.remove("active"); 
+}
+
+function kembaliKeAwal() { 
+window.location.href = "index.html"; 
+}
+// 1. BLOKIR SHORTCUT TOMBOL KEYBOARD UNTUK SCREENSHOT
+window.addEventListener("keydown", function(e) {
+  // Blokir Ctrl + P (Cetak halaman web)
+  if (e.ctrlKey && e.key === 'p') {
+    e.preventDefault();
+    alert("Dilarang mencetak halaman ujian!");
+  }
+  
+  // Blokir Win + Shift + S atau Cmd + Shift + 4 (Snipping Tool Mac/Windows)
+  if ((e.metaKey || e.metaKey && e.shiftKey && e.key === 's') || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+    e.preventDefault();
+    alert("Fitur Tangkapan Layar Dinonaktifkan!");
+  }
+});
+
+// 2. AMANKAN CLIPBOARD (Bila siswa menekan tombol PrintScreen biasa)
+window.addEventListener("keyup", function(e) {
+  if (e.key === "PrintScreen") {
+    // Paksa salin teks kosong ke memori laptop untuk merusak hasil screenshot
+    navigator.clipboard.writeText("").then(() => {
+      alert("Screenshot dilarang! Hasil tangkapan layar Anda telah dihapus secara otomatis.");
+      
+      // OPSIONAL: Laporkan status curang ke halaman admin jika diperlukan
+      if (idSiswaTerpilih) {
+        fetch(WEB_APP_URL, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ id_siswa: idSiswaTerpilih, aksi: "LAPOR_CURANG" })
+        });
+      }
+    });
+  }
+});
+
+// 3. BLOKIR KLIK KANAN (Agar siswa tidak bisa klik kanan lalu pilih inspect/save image)
+document.addEventListener("contextmenu", function(e) {
+  e.preventDefault();
+});
+
+</script>
+</body>
+</html>

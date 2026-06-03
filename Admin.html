@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Kontrol Admin - SMAN 15 Maluku Tengah</title>
+<style>
+/* --- CSS DASAR: PASTI TERBACA OLEH BROWSER APA PUN DAN OFFLINE --- */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+body { background-color: #f1f5f9; padding-bottom: 50px; color: #334155; }
+/* Navigasi Atas */
+.navbar { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.navbar h1 { font-size: 20px; font-weight: 700; margin-bottom: 2px; }
+.navbar p { font-size: 12px; color: #cbd5e1; }
+.nav-btns { display: flex; gap: 10px; }
+/* Tombol */
+.btn { padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; transition: 0.2s; }
+.btn-blue { background-color: #2563eb; color: white; }
+.btn-blue:hover { background-color: #1d4ed8; }
+.btn-amber { background-color: #d97706; color: white; }
+.btn-amber:hover { background-color: #b45309; }
+.btn-green { background-color: #16a34a; color: white; }
+.btn-green:hover { background-color: #15803d; }
+/* Wadah Konten */
+.container { max-width: 1200px; margin: 25px auto; padding: 0 20px; }
+/* Filter Section */
+.filter-card { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.filter-groups { display: flex; gap: 15px; }
+.input-group { display: flex; flex-direction: column; gap: 5px; }
+.input-group label { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; }
+.select-box { border: 1px solid #cbd5e1; padding: 8px 12px; font-size: 14px; background-color: #f8fafc; border-radius: 6px; outline: none; min-width: 180px; }
+/* Kotak Statistik Realtime */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+.stat-card { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+.stat-emoji { font-size: 28px; }
+.stat-info p { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+.stat-info h3 { font-size: 24px; font-weight: 700; margin-top: 2px; }
+/* Variasi Pinggiran Warna Kartu */
+.border-blue { border-left: 5px solid #2563eb; }
+.border-green { border-left: 5px solid #16a34a; } .border-green h3 { color: #16a34a; }
+.border-amber { border-left: 5px solid #d97706; } .border-amber h3 { color: #d97706; }
+.border-red { border-left: 5px solid #dc2626; } .border-red h3 { color: #dc2626; }
+/* Tabel */
+.table-card { background: white; border-radius: 10px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+th { background-color: #f8fafc; padding: 15px; font-weight: 600; color: #475569; font-size: 12px; border-bottom: 2px solid #e2e8f0; text-transform: uppercase; }
+td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #334155; }
+tr:hover { background-color: #f8fafc; }
+/* Status Badges */
+.badge { padding: 4px 10px; border-radius: 50px; font-size: 11px; font-weight: 700; display: inline-block; text-transform: uppercase; }
+.badge-gray { background-color: #e2e8f0; color: #475569; }
+.badge-amber { background-color: #fef3c7; color: #b45309; }
+.badge-green { background-color: #d1fae5; color: #065f46; }
+.badge-red { background-color: #fee2e2; color: #991b1b; animation: pulse 1s infinite; }
+.badge-danger { background-color: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; font-weight: bold; animation: blinker 1.2s linear infinite; }
+@keyframes blinker { 50% { opacity: 0; } }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+/* Desain Khusus Cetak PDF */
+.pdf-header { display: none; }
+@media print {
+.no-print { display: none !important; }
+body { background: white; padding: 0; }
+.container { max-width: 100%; margin: 0; padding: 0; }
+.table-card { border: none; box-shadow: none; }
+th, td { border: 1px solid #94a3b8 !important; padding: 8px !important; }
+.pdf-header { display: block !important; text-align: center; margin-bottom: 20px; border-bottom: 3px double #000; padding-bottom: 10px; }
+}
+</style>
+</head>
+<body>
+<!-- NAVBAR ATAS (TIDAK IKUT DICETAK DI PDF) -->
+<div class="navbar no-print">
+<div class="nav-logo">
+<h1>Panel Administrasi LMS</h1>
+<p>SMAN 15 Maluku Tengah</p>
+</div>
+<div class="nav-btns">
+<button onclick="muatDataAdmin()" class="btn btn-blue">🔄 Refresh Data</button>
+<a href="index.html" class="btn btn-amber">🏠 Keluar Portal</a>
+</div>
+</div>
+<!-- AREA KONTEN UTAMA -->
+<div class="container">
+<!-- KOP SURAT FORMAL (HANYA MUNCUL KETIKA DI-DOWNLOAD JADI PDF) -->
+<div class="pdf-header">
+<h1 style="font-size: 22px; font-weight: bold;">REKAPITULASI NILAI LATIHAN SOAL SISWA</h1>
+<h2 style="font-size: 16px; font-weight: bold; color: #475569;">SMA NEGERI 15 MALUKU TENGAH</h2>
+<p style="font-size: 12px; margin-top: 5px; color: #64748b;">Mata Pelajaran: Pendidikan Pancasila | Guru Pengampu: Usep Saepudin</p>
+</div>
+<!-- BARIS FILTER & TOMBOL PDF (TIDAK IKUT DICETAK DI PDF) -->
+<div class="filter-card no-print">
+<div class="filter-groups">
+<div class="input-group">
+<label>Pilih Kelas</label>
+<select id="filterKelas" onchange="filterTabelSiswa()" class="select-box">
+<option value="ALL">Semua Kelas</option>
+</select>
+</div>
+<div class="input-group">
+<label>Pilih Paket Soal</label>
+<!-- PERBAIKAN: List pilihan latihan dikosongkan penuh agar diisi otomatis secara fleksibel dari Google Sheet -->
+<select id="filterLatihan" onchange="filterTabelSiswa()" class="select-box">
+</select>
+</div>
+</div>
+<button onclick="unduhPDFPerKelas()" class="btn btn-green">📄 Cetak / Unduh PDF Kelas</button>
+</div>
+<!-- INDIKATOR STATISTIK REALTIME (TIDAK IKUT DICETAK DI PDF) -->
+<div class="stats-grid no-print">
+<div class="stat-card border-blue">
+<div class="stat-emoji">👥</div>
+<div class="stat-info"><p>Total Siswa</p><h3 id="statTotal">0</h3></div>
+</div>
+<div class="stat-card border-green">
+<div class="stat-emoji">✅</div>
+<div class="stat-info"><p>Sudah Selesai</p><h3 id="statSelesai">0</h3></div>
+</div>
+<div class="stat-card border-amber">
+<div class="stat-emoji">⏳</div>
+<div class="stat-info"><p>Sedang Ujian</p><h3 id="statUjian">0</h3></div>
+</div>
+<div class="stat-card border-red">
+<div class="stat-emoji">🚨</div>
+<div class="stat-info"><p>Kecurangan</p><h3 id="statCurang">0</h3></div>
+</div>
+</div>
+<!-- BLOK TABEL DATA NILAI -->
+<div class="table-card">
+<div class="pdf-header" style="border:none; margin:0; padding:5px 15px; font-size:12px; font-weight:bold; display:none;">
+<p>Kelas Terpilih: <span id="printLabelKelas" style="font-weight:normal;">-</span> | Tanggal Unduh: <span id="printLabelTanggal" style="font-weight:normal;">-</span></p>
+</div>
+<table>
+<thead>
+<tr>
+<th style="text-align: center; width: 60px;">No</th>
+<th>ID Siswa</th>
+<th>Nama Lengkap</th>
+<th style="text-align: center; width: 120px;">Kelas</th>
+<th style="text-align: center; width: 160px;" class="no-print">Status Realtime</th>
+<th style="text-align: center; width: 110px;">Nilai Ujian</th>
+<th style="text-align: center; width: 110px;">Status Kecurangan</th>
+</tr>
+</thead>
+<tbody id="tabelSiswaBody">
+<tr>
+<td colspan="6" style="text-align: center; padding: 40px; color: #94a3b8; font-weight: 500;">Menghubungkan ke server database Google Sheet...</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3Wz-KzLUmWQgnuPHp0k1iDbTsY6Icw-Gwp-YVC3Zv_MoXVC6HJb0imNFmgmY2VKnX/exec";
+let masterSiswa = [];
+let daftarKelasUnik = [];
+let daftarPaketLatihan = []; // Menyimpan kunci paket latihan dinamis (1, 2, 3, dst.)
+
+window.onload = function() {
+muatDataAdmin();
+setInterval(muatDataAdminOtomatis, 10000); 
+};
+
+function muatDataAdmin() {
+const tbody = document.getElementById("tabelSiswaBody");
+tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 40px; color: #2563eb; font-weight: bold;">🔄 Sinkronisasi Google Sheet...</td></tr>`;
+muatDataAdminOtomatis(true); // IsFirstLoad = true untuk memicu pembuatan dropdown
+}
+
+function muatDataAdminOtomatis(isFirstLoad = false) {
+  fetch(WEB_APP_URL + "?role=admin")
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) { return console.error(data.error); }
+
+    // 1. Memetakan seluruh data siswa secara fleksibel sesuai kiriman Apps Script
+    masterSiswa = data.siswa.map(s => {
+      let objekSiswa = {
+        id: s.id,
+        nama: s.nama,
+        kelas: s.kelas,
+        status_ujian: s.status_ujian,
+        status_kecurangan: s.status_kecurangan // Membaca kolom AF dari database
+      };
+      
+      // Mengubah format property "nilai_latihan_1" menjadi "nilai_1" agar dibaca oleh fungsi filterTabelSiswa
+      Object.keys(s).forEach(key => {
+        if (key.startsWith("nilai_latihan_")) {
+          let nomorLatihan = key.replace("nilai_latihan_", "");
+          objekSiswa["nilai_" + nomorLatihan] = s[key];
+        }
+      });
+      return objekSiswa;
+    });
+
+    // 2. PERBAIKAN TOTAL: Membaca nama properti dari data siswa indeks ke-0 secara aman
+    if (isFirstLoad) {
+      let setPaketUnik = new Set();
+      if (data.siswa && data.siswa.length > 0) {
+        // Mengintip data siswa pertama (indeks 0) untuk mengetahui ada latihan apa saja
+        Object.keys(data.siswa[0]).forEach(key => {
+          if (key.startsWith("nilai_latihan_")) {
+            setPaketUnik.add(key.replace("nilai_latihan_", ""));
+          }
+        });
+      }
+      
+      // Urutkan nomor latihan secara matematika agar teratur (1, 2, ..., 10, 11, dst)
+      daftarPaketLatihan = Array.from(setPaketUnik).sort((a, b) => parseInt(a) - parseInt(b));
+      
+      // Perbarui dropdown tampilan
+      perbaruiDropdownLatihan();
+      perbaruiDropdownKelas();
+    }
+
+    // 3. Render ulang data ke tabel
+    filterTabelSiswa();
+  })
+  .catch(err => console.log("Mencoba sinkronisasi ulang jaringan..."));
+}
+
+// FUNGSI BARU: Mengisi pilihan paket latihan secara otomatis berdasarkan database Google Sheet
+function perbaruiDropdownLatihan() {
+  const selectLatihan = document.getElementById("filterLatihan");
+  const nilaiSebelumnya = selectLatihan.value;
+
+  selectLatihan.innerHTML = "";
+  daftarPaketLatihan.forEach(key => {
+    let opt = document.createElement("option");
+    opt.value = key;
+    opt.textContent = "Nilai Latihan " + key;
+    selectLatihan.appendChild(opt);
+  });
+
+  if(nilaiSebelumnya && daftarPaketLatihan.includes(nilaiSebelumnya)) {
+    selectLatihan.value = nilaiSebelumnya;
+  }
+}
+
+function perbaruiDropdownKelas() {
+  const selectKelas = document.getElementById("filterKelas");
+  const nilaiSebelumnya = selectKelas.value;
+
+  const semuaKelas = masterSiswa.map(s => s.kelas).filter(k => k !== "");
+  daftarKelasUnik = [...new Set(semuaKelas)].sort();
+
+  selectKelas.innerHTML = '<option value="ALL">Semua Kelas</option>';
+  daftarKelasUnik.forEach(namaKelas => {
+    let opt = document.createElement("option");
+    opt.value = namaKelas;
+    opt.textContent = namaKelas;
+    selectKelas.appendChild(opt);
+  });
+
+  selectKelas.value = nilaiSebelumnya;
+}
+
+function filterTabelSiswa() {
+  const kelasDipilih = document.getElementById("filterKelas").value;
+  const nomorLatihan = document.getElementById("filterLatihan").value;
+  const tbody = document.getElementById("tabelSiswaBody");
+  tbody.innerHTML = "";
+
+  let dataTerfilter = kelasDipilih === "ALL" ? masterSiswa : masterSiswa.filter(s => s.kelas === kelasDipilih);
+
+  if (dataTerfilter.length === 0 || !nomorLatihan) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 20px; color: #94a3b8;">Tidak ada data siswa untuk kelas ini atau paket belum siap.</td></tr>`;
+    hitungUlangStatistik(dataTerfilter, nomorLatihan);
+    return;
+  }
+
+  dataTerfilter.forEach((siswa, index) => {
+    let skoring = siswa["nilai_" + nomorLatihan] !== undefined ? siswa["nilai_" + nomorLatihan] : "-";
+
+    // 1. Logika untuk kolom STATUS REALTIME (Kolom AE)
+    let badgeRealtime = `<span class="badge badge-gray">Belum Masuk</span>`;
+    let rowBg = "";
+
+    if (siswa.status_ujian === "ONLINE") {
+      badgeRealtime = `<span class="badge badge-amber">Sedang Ujian</span>`;
+      rowBg = "background-color: #fef8ec;"; 
+    } else if (siswa.status_ujian === "SELESAI" || skoring !== "-") {
+      badgeRealtime = `<span class="badge badge-green">Selesai</span>`;
+    }
+
+    // 2. Logika untuk kolom STATUS KECURANGAN baru (Kolom AF)
+    let badgeKecurangan = `<span style="color: #94a3b8;">-</span>`; // Default jika tertib
+    if (siswa.status_kecurangan === "CURANG") {
+      badgeKecurangan = `<span class="badge badge-danger">🚨 CURANG</span>`;
+      rowBg = "background-color: #fee2e2;"; // Ubah latar belakang sebaris jadi merah soft
+    }
+
+    let textStyle = (skoring !== "-" && skoring >= 75) ? "color: #16a34a; font-weight: bold; font-size:15px;" : (skoring === "-" ? "color: #94a3b8;" : "color: #ef4444; font-weight: bold;");
+
+    // 3. Render HTML dengan susunan 7 kolom agar pas dengan header tabel Anda
+    let tr = document.createElement("tr");
+    if(rowBg) tr.setAttribute("style", rowBg);
+    tr.innerHTML = `
+      <td style="text-align: center; color: #94a3b8; font-weight: 600;">${index + 1}</td>
+      <td style="font-family: monospace; font-weight: bold; color: #475569;">${siswa.id}</td>
+      <td style="font-weight: 600; color: #0f172a;">${siswa.nama}</td>
+      <td style="text-align: center; font-weight: 500;">${siswa.kelas}</td>
+      <td style="text-align: center;" class="no-print">${badgeRealtime}</td>
+      <td style="text-align: center; ${textStyle}">${skoring}</td>
+      <td style="text-align: center;">${badgeKecurangan}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  hitungUlangStatistik(dataTerfilter, nomorLatihan);
+}
+
+
+function hitungUlangStatistik(arr, nomorLatihan) {
+  document.getElementById("statTotal").innerText = arr.length;
+  if(!nomorLatihan) return;
+
+  let jumlahSelesai = arr.filter(s => {
+    let skor = s["nilai_" + nomorLatihan];
+    return s.status_ujian === "SELESAI" || (skor !== undefined && skor !== "-");
+  }).length;
+
+  // PERBAIKAN STATISTIK: Menghitung status online murni dan kecurangan dari kolom AF
+  let jumlahOnline = arr.filter(s => s.status_ujian === "ONLINE" && s.status_kecurangan !== "CURANG").length;
+  let jumlahCurang = arr.filter(s => s.status_kecurangan === "CURANG").length;
+
+  document.getElementById("statSelesai").innerText = jumlahSelesai;
+  document.getElementById("statUjian").innerText = jumlahOnline;
+  document.getElementById("statCurang").innerText = jumlahCurang;
+}
+
+function unduhPDFPerKelas() {
+  const kelas = document.getElementById("filterKelas").value;
+  const tgl = new Date().toLocaleString("id-ID", { dateStyle: "long", timeStyle: "short" });
+  document.getElementById("printLabelKelas").innerText = kelas === "ALL" ? "Semua Kelas" : "Kelas " + kelas;
+  document.getElementById("printLabelTanggal").innerText = tgl + " WIT";
+  window.print();
+}
+// OTOMATIS: Setiap kali admin login/buka halaman, perbarui koordinat GPS admin ke Google Sheet
+window.addEventListener("DOMContentLoaded", function() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      let latAdmin = position.coords.latitude;
+      let lonAdmin = position.coords.longitude;
+
+      // Kirim koordinat mutakhir posisi admin ke Google Sheet
+      fetch(WEB_APP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({
+          aksi: "UPDATE_LOKASI_ADMIN",
+          lat: latAdmin,
+          lon: lonAdmin
+        })
+      })
+      .then(res => res.json())
+      .then(res => console.log("Lokasi pusat admin berhasil diperbarui secara real-time!"))
+      .catch(e => console.log("Gagal sinkronisasi lokasi admin."));
+    }, function(err) {
+      console.log("Izin GPS Admin dinonaktifkan browser.");
+    }, { enableHighAccuracy: true });
+  }
+});
+
+</script>
+</body>
+</html>

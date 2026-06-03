@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lembar Kerja Peserta Didik (LKPD) - SMAN 15 Maluku Tengah</title>
+<!-- Google Fonts & Font Awesome Icons -->
+<link href="https://cloudflare.com" rel="stylesheet">
+<!-- Salin dan tempel kode ini di dalam tag <head> -->
+<link rel="preconnect" href="https://googleapis.com">
+<link rel="preconnect" href="https://gstatic.com" crossorigin>
+<link href="https://googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* --- GOOGLE FONTS CORE --- */
+@import url('https://googleapis.com');
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+body { background: #f4f7fa; color: #334155; padding-bottom: 60px; -webkit-font-smoothing: antialiased; }
+
+/* --- GLASS-HEADER PREMIUM --- */
+.navbar { 
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); 
+  color: white; 
+  padding: 18px 40px; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  box-shadow: 0 4px 20px rgba(2, 132, 199, 0.15);
+}
+.navbar h1 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 20px; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.navbar span { font-size: 13px; background: rgba(255, 255, 255, 0.15); padding: 6px 14px; border-radius: 50px; font-weight: 500; backdrop-filter: blur(4px); }
+
+/* --- LAYOUT UTAMA FULL WIDTH DYNAMIC --- */
+.container { 
+  width: 96%; 
+  max-width: 1600px; 
+  margin: 30px auto; 
+  display: grid; 
+  grid-template-columns: 340px 1fr; 
+  gap: 30px; 
+}
+
+/* --- SIDEBAR PANEL MODERN --- */
+.sidebar { 
+  background: #ffffff; 
+  padding: 30px 24px; 
+  border-radius: 16px; 
+  border: 1px solid rgba(226, 232, 240, 0.8); 
+  height: fit-content; 
+  display: flex; 
+  flex-direction: column; 
+  gap: 24px; 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+}
+.form-group { display: flex; flex-direction: column; gap: 10px; }
+.form-group label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 6px; }
+.form-select { 
+  width: 100%; 
+  padding: 14px; 
+  border-radius: 10px; 
+  border: 1px solid #cbd5e1; 
+  font-size: 14px; 
+  font-weight: 500;
+  outline: none; 
+  background: #f8fafc; 
+  cursor: pointer; 
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); 
+  color: #1e293b;
+}
+.form-select:focus { border-color: #0284c7; background: #ffffff; box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.12); }
+
+/* --- PANEL KONTEN LEMBAR KERJA --- */
+.main-content { display: flex; flex-direction: column; gap: 24px; }
+.card { 
+  background: #ffffff; 
+  padding: 40px; 
+  border-radius: 16px; 
+  border: 1px solid rgba(226, 232, 240, 0.8); 
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.02), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+}
+#judulLKPD { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 25px; display: flex; align-items: center; gap: 12px; }
+
+/* KARTU KOMPONEN (Tujuan, Materi, Soal) */
+.card h3 { 
+  font-family: 'Plus Jakarta Sans', sans-serif; 
+  font-size: 13px; 
+  color: #0284c7; 
+  text-transform: uppercase; 
+  margin-bottom: 14px; 
+  padding-bottom: 6px; 
+  display: flex; 
+  align-items: center; 
+  gap: 8px; 
+  font-weight: 800; 
+  letter-spacing: 0.8px; 
+}
+.text-box { 
+  font-size: 15px; 
+  line-height: 1.75; 
+  color: #334155; 
+  white-space: pre-line; 
+  background: #f8fafc; 
+  padding: 22px; 
+  border-radius: 12px; 
+  border-left: 5px solid #0284c7; 
+  margin-bottom: 28px;
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
+}
+
+/* KUSTOMISASI WARNA INDIKATOR SEBELAH KIRI */
+.border-amber { border-left-color: #f59e0b !important; background: #fffbeb !important; }
+.border-emerald { border-left-color: #10b981 !important; background: #f0fdf4 !important; }
+.border-rose { border-left-color: #f43f5e !important; background: #fff1f2 !important; font-weight: 600; font-size: 16px; }
+
+/* --- AREA INPUT JAWABAN PREMIUM --- */
+.textarea-jawaban { 
+  width: 100%; 
+  min-height: 240px; 
+  padding: 20px; 
+  border-radius: 12px; 
+  border: 1px solid #cbd5e1; 
+  font-size: 15px; 
+  resize: vertical; 
+  outline: none; 
+  line-height: 1.75; 
+  background: #ffffff; 
+  transition: all 0.25s ease;
+  color: #1e293b;
+}
+.textarea-jawaban:focus { border-color: #10b981; box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15); background: #fcfdfc; }
+
+/* --- TOMBOL SUBMIT EFEK HOVER SHADOW --- */
+.btn-submit { 
+  background: #10b981; 
+  color: white; 
+  padding: 14px 32px; 
+  border-radius: 10px; 
+  font-size: 14px; 
+  font-weight: 600; 
+  border: none; 
+  cursor: pointer; 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 8px; 
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); 
+}
+.btn-submit:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4); }
+.btn-submit:active { transform: translateY(0); }
+
+/* --- BOX HASIL SMART EVALUASI AI --- */
+.result-box { 
+  display: none; 
+  margin-top: 30px; 
+  padding: 25px; 
+  border-radius: 12px; 
+  font-size: 15px; 
+  line-height: 1.8; 
+  border-left: 5px solid #10b981; 
+  background: #f0fdf4; 
+  color: #14532d;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
+}
+
+/* --- SCREEN AUTO LOADING BLUR EFFECT --- */
+.loading-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(244, 247, 250, 0.85); backdrop-filter: blur(6px); z-index:999; display:none; justify-content:center; align-items:center; flex-direction:column; gap:18px; font-weight:700; color:#0369a1; font-size:16px; font-family: 'Plus Jakarta Sans', sans-serif; }
+.spinner { width: 50px; height: 50px; border: 5px solid #cbd5e1; border-top: 5px solid #0284c7; border-radius: 50%; animation: spin 0.8s linear infinite; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div id="loadingText">Menghubungkan ke basis data LKPD...</div>
+</div>
+
+<div class="navbar">
+  <h1><i class="fa-solid fa-book-open"></i> Lembar Kerja Peserta Didik (LKPD)</h1>
+  <span style="font-size: 13px; font-weight: 500;">PPKn | SMAN 15 Maluku Tengah</span>
+</div>
+
+<div class="container">
+  <!-- SIDEBAR PILIHAN TUGAS & SISWA -->
+  <div class="sidebar">
+    <div class="form-group">
+      <label><i class="fa-solid fa-list-check"></i> Pilih Tugas LKPD</label>
+      <select id="selectLKPD" class="form-select" onchange="tampilkanMateriLKPD()">
+        <option value="">-- Memuat LKPD... --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label><i class="fa-solid fa-user"></i> Pilih Nama Anda</label>
+      <select id="selectSiswa" class="form-select">
+        <option value="">-- Memuat Nama... --</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- AREA KONTEN UTAMA MATERI & INPUT JAWABAN -->
+  <div class="main-content">
+    <div class="card">
+      <h2 id="judulLKPD" style="color: #1e3c72; font-size: 18px; margin-bottom: 15px;">Judul Tugas LKPD</h2>
+      
+      <h3><i class="fa-solid fa-bullseye"></i> Tujuan Pembelajaran</h3>
+      <p id="tujuanLKPD" class="text-box" style="border-left-color: #eab308; margin-bottom: 20px;">Memuat tujuan...</p>
+      
+      <h3><i class="fa-solid fa-bookmark"></i> Materi Ajar</h3>
+      <p id="materiLKPD" class="text-box" style="margin-bottom: 20px;">Memuat rangkuman materi...</p>
+      
+      <h3><i class="fa-solid fa-circle-info"></i> Petunjuk Kerja</h3>
+      <p id="petunjukLKPD" class="text-box" style="border-left-color: #10b981; margin-bottom: 20px;">Memuat petunjuk pengerjaan tugas...</p>
+      
+      <h3><i class="fa-solid fa-pen-to-square"></i> Soal / Tugas LKPD</h3>
+      <p id="tugasLKPD" class="text-box" style="border-left-color: #ef4444; font-weight: 600; margin-bottom: 25px;">Memuat pertanyaan tugas...</p>
+      
+      <h3><i class="fa-solid fa-reply"></i> Ketik Jawaban Anda Di Sini</h3>
+      <textarea id="jawabanSiswa" class="textarea-jawaban" placeholder="Tuliskan analisis atau kesimpulan jawaban Anda secara lengkap sesuai petunjuk kerja..."></textarea>
+      
+      <div style="margin-top: 15px; display: flex; align-items: center; justify-content: space-between;">
+        <span style="font-size: 12px; color: #94a3b8;">*Pastikan koneksi internet aktif saat mengirim tugas.</span>
+        <button class="btn_submit btn-submit" onclick="kirimTugasLKPD()"><i class="fa-solid fa-paper-plane"></i> Kirim Tugas LKPD</button>
+      </div>
+
+      <!-- Kotak Notifikasi Evaluasi AI -->
+      <div id="boxHasilAI" class="result-box result-success">
+        <strong><i class="fa-solid fa-robot"></i> Hasil Evaluasi Kecerdasan Buatan (AI):</strong>
+        <p id="teksHasilAI" style="margin-top: 5px;"></p>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+// SILAKAN PASTIKAN DIISI DENGAN URL WEB APP GOOGLE APPS SCRIPT ANDA YANG ASLI
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw3Wz-KzLUmWQgnuPHp0k1iDbTsY6Icw-Gwp-YVC3Zv_MoXVC6HJb0imNFmgmY2VKnX/exec";
+let bankLKPDGlobal = {};
+
+window.onload = function() {
+  document.getElementById("loadingOverlay").style.display = "flex";
+  
+  // 1. Ambil data struktur materi LKPD dari Sheet "LKPD"
+  fetch(WEB_APP_URL + "?role=get_lkpd_soal")
+  .then(res => res.json())
+  .then(dataLKPD => {
+    bankLKPDGlobal = dataLKPD;
+    
+    let selectLKPD = document.getElementById("selectLKPD");
+    selectLKPD.innerHTML = "";
+    Object.keys(bankLKPDGlobal).forEach(key => {
+      let opt = document.createElement("option");
+      opt.value = key;
+      opt.textContent = "Tugas " + key;
+      selectLKPD.appendChild(opt);
+    });
+
+    // 2. Ambil data nama siswa dari Sheet "Database_Siswa" untuk dropdown login
+    return fetch(WEB_APP_URL + "?role=admin");
+  })
+  .then(res => res.json())
+  .then(dataSiswa => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    let selectSiswa = document.getElementById("selectSiswa");
+    selectSiswa.innerHTML = '<option value="">-- Pilih Nama Anda --</option>';
+    dataSiswa.siswa.forEach(s => {
+      let opt = document.createElement("option");
+      opt.value = s.id;
+      opt.textContent = s.nama + " (" + s.kelas + ")";
+      selectSiswa.appendChild(opt);
+    });
+    tampilkanMateriLKPD();
+  })
+  .catch(err => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    alert("Gagal memuat database LKPD. Pastikan Anda sudah mengupdate Google Apps Script.");
+  });
+};
+
+function tampilkanMateriLKPD() {
+  let idLKPD = document.getElementById("selectLKPD").value;
+  if (!idLKPD || !bankLKPDGlobal[idLKPD]) return;
+  
+  let data = bankLKPDGlobal[idLKPD];
+  document.getElementById("judulLKPD").innerText = idLKPD + ": " + data.judul;
+  document.getElementById("tujuanLKPD").innerText = data.tujuan;
+  document.getElementById("materiLKPD").innerText = data.materi;
+  document.getElementById("petunjukLKPD").innerText = data.petunjuk;
+  document.getElementById("tugasLKPD").innerText = data.tugas;
+  
+  // Reset form jawaban dan hasil AI sebelumnya
+  document.getElementById("jawabanSiswa").value = "";
+  document.getElementById("boxHasilAI").style.display = "none";
+}
+
+function kirimTugasLKPD() {
+  let idSiswa = document.getElementById("selectSiswa").value;
+  let idLKPD = document.getElementById("selectLKPD").value;
+  let jawaban = document.getElementById("jawabanSiswa").value.trim();
+
+  if (!idSiswa) return alert("Pilih Nama Anda terlebih dahulu!");
+  if (!jawaban) return alert("Ketikkan jawaban tugas Anda terlebih dahulu!");
+
+  document.getElementById("loadingOverlay").style.display = "flex";
+  document.getElementById("loadingText").innerText = "Mengirim jawaban & menganalisis menggunakan AI...";
+
+  let payload = {
+    aksi: "KIRIM_JAWABAN_LKPD",
+    id_siswa: idSiswa,
+    id_lkpd: idLKPD,
+    jawaban_siswa: jawaban
+  };
+
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(res => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    if (res.result === "Sukses") {
+      document.getElementById("teksHasilAI").innerHTML = `
+        <strong>Nilai:</strong> <span style="font-size:18px; color:#10b981;">${res.nilai}</span><br>
+        <strong>Komentar:</strong> ${res.komentar}
+      `;
+      document.getElementById("boxHasilAI").style.display = "block";
+      alert("Tugas LKPD Berhasil Dikirim dan Dinilai!");
+    } else {
+      alert("Gagal memproses pengiriman: " + res.message);
+    }
+  })
+  .catch(err => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    alert("Koneksi bermasalah saat mengirim tugas.");
+  });
+}
+</script>
+</body>
+</html>
