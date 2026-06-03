@@ -336,41 +336,70 @@ document.getElementById("timer").innerText = m + ":" + s;
 }
 
 function submitExam() {
-if (!idSiswaTerpilih) { return alert("Identitas belum valid. Gagal mengirim!"); }
-if (!confirm("Apakah kamu yakin ingin mengirim semua jawaban sekarang?")) return;
-clearInterval(intervalTimer);
-let benar = 0;
-listSoalAktif.forEach(s => {
-if (jawabanSiswa[s.id] && jawabanSiswa[s.id].trim().toUpperCase() === s.key.trim().toUpperCase()) {
-benar++;
-}
-});
-let skor = Math.round((benar / listSoalAktif.length) * 100);
-let paket = document.getElementById("selectLatihan").value;
-document.getElementById("loadingOverlay").style.display = "flex";
-document.getElementById("loadingText").innerText = "Menyimpan nilai ke spreadsheet...";
-const payload = {
-id_siswa: idSiswaTerpilih,
-nilai: skor,
-kolom: "Nilai_Latihan_" + paket,
-aksi: "KIRIM_NILAI"
-};
-fetch(WEB_APP_URL, {
-method: "POST",
-headers: { "Content-Type": "text/plain;charset=utf-8" },
-body: JSON.stringify(payload)
-})
-.then(res => res.json())
-.then(res => {
-document.getElementById("loadingOverlay").style.display = "none";
-document.getElementById("scoreDisplay").innerText = skor;
-document.getElementById("resultStatus").innerText = skor >= 75 ? "Selamat, kamu lulus KKM!" : "Ayo belajar lagi dengan giat!";
-document.getElementById("resultModal").classList.add("active");
-})
-.catch(err => {
-document.getElementById("loadingOverlay").style.display = "none";
-alert("Gagal kirim nilai ke server. Hubungi Pak Usep dan JANGAN TUTUP TAB INI!");
-});
+  if (!idSiswaTerpilih) { return alert("Identitas belum valid. Gagal mengirim!"); }
+  
+  // === 1. KODE BARU: CEK APAKAH PAKET INI SUDAH PERNAH DIKERJAKAN ===
+  let paket = document.getElementById("selectLatihan").value;
+  let kunciUjian = "terkunci_" + idSiswaTerpilih + "_paket_" + paket;
+  
+  if (localStorage.getItem(kunciUjian) === "true") {
+    return alert("Maaf, kamu sudah mengirimkan jawaban untuk latihan ini sebelumnya!");
+  }
+  // ==============================================================
+
+  if (!confirm("Apakah kamu yakin ingin mengirim semua jawaban sekarang?")) return;
+  clearInterval(intervalTimer);
+  
+  let benar = 0;
+  listSoalAktif.forEach(s => {
+    if (jawabanSiswa[s.id] && jawabanSiswa[s.id].trim().toUpperCase() === s.key.trim().toUpperCase()) {
+      benar++;
+    }
+  });
+  
+  let skor = Math.round((benar / listSoalAktif.length) * 100);
+  
+  document.getElementById("loadingOverlay").style.display = "flex";
+  document.getElementById("loadingText").innerText = "Menyimpan nilai ke spreadsheet...";
+  
+  const payload = {
+    id_siswa: idSiswaTerpilih,
+    nilai: skor,
+    kolom: "Nilai_Latihan_" + paket,
+    aksi: "KIRIM_NILAI"
+  };
+  
+  fetch(WEB_APP_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  })
+  .then(res => res.json())
+  .then(res => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    
+    // === 2. KODE BARU: KUNCI TOMBOL & SIMPAN STATUS SETELAH SUKSES ===
+    // Menyimpan status kunci di HP siswa
+    localStorage.setItem(kunciUjian, "true");
+    
+    // Otomatis mencari tombol kirim ujian dan mematikannya (disabled)
+    let semuaTombol = document.getElementsByTagName("button");
+    for (let b of semuaTombol) {
+      if (b.getAttribute("onclick") && b.getAttribute("onclick").includes("submitExam")) {
+        b.disabled = true;
+        b.innerText = "Ujian Selesai (Terkunci)";
+      }
+    }
+    // ==============================================================
+    
+    document.getElementById("scoreDisplay").innerText = skor;
+    document.getElementById("resultStatus").innerText = skor >= 75 ? "Selamat, kamu lulus KKM!" : "Ayo belajar lagi dengan giat!";
+    document.getElementById("resultModal").classList.add("active");
+  })
+  .catch(err => {
+    document.getElementById("loadingOverlay").style.display = "none";
+    alert("Gagal kirim nilai ke server. Hubungi Pak Usep dan JANGAN TUTUP TAB INI!");
+  });
 }
 
 function closeModal() { 
